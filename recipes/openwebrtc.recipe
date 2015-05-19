@@ -39,9 +39,9 @@ class Recipe(recipe.Recipe):
     stype = SourceType.GIT
     licenses = [License.BSD_like]
     remotes = {
-        'origin': 'https://github.com/EricssonResearch/openwebrtc.git'
+        'origin': 'https://github.com/AlertMe/openwebrtc.git'
     }
-    commit = 'origin/master'
+    commit = '6487e9e90b5b10cb9c62e50f89e56828386159cf'
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'
     # Dependencies used in the dynamic (shared) build of OWRTC

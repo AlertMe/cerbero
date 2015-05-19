@@ -38,10 +38,18 @@ class Recipe(recipe.Recipe):
     _api_version = '0.1'
     stype = SourceType.GIT
     licenses = [License.BSD_like]
+    
     remotes = {
+        # Custom repo on GitHub 'AlertMe/openwebrtc'
         'origin': 'https://github.com/AlertMe/openwebrtc.git'
+        
+        # For development one can use a local revision
+	# 'origin': '<path_to>/openwebrtc'
     }
-    commit = '707a0a7c5eca32f58cff47a9088de0d4146223a5'
+    
+    # Which commit to be picked up from local/remote repo
+    commit = '91e92dfd61ef817bbe4544ffde833be839e739ef'
+    
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'
     # Dependencies used in the dynamic (shared) build of OWRTC

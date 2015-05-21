@@ -44,11 +44,11 @@ class Recipe(recipe.Recipe):
         'origin': 'https://github.com/AlertMe/openwebrtc.git'
         
         # For development one can use a local revision
-	# 'origin': '<path_to>/openwebrtc'
+	# 'origin': '/users/mirek/devel/openwebrtc'
     }
     
     # Which commit to be picked up from local/remote repo
-    commit = '3b8d84c4415907ef363618ace0ff9a637862cc01'
+    commit = 'edcf383130f022b45e0dab1ffd09064e7f70a769'
     
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'

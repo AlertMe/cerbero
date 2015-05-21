@@ -2,8 +2,12 @@
 
 ## Changes by AlertMe are located on branch 'custom'
 
-To use just do 'git checkout custom' then follow the build instructions
+To use just do
 
+     git checkout custom
+     
+then follow the build instructions
+     
 ## How to make changes in projects that cerbero builds?
 
 Checkout the project (for example https://github.com/AlertMe/openwebrtc).

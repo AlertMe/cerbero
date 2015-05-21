@@ -126,6 +126,13 @@ def system_info():
     # Get the distro info
     if platform == Platform.LINUX:
         d = pplatform.linux_distribution()
+
+        if d[0] == '' and d[1] == '' and d[2] == '':
+            if os.path.exists('/etc/arch-release'):
+                # FIXME: the python2.7 platform module does not support Arch Linux.
+                # Mimic python3.4 platform.linux_distribution() output.
+                d = ('arch', 'Arch', 'Linux')
+
         if d[0] in ['Ubuntu', 'debian', 'LinuxMint']:
             distro = Distro.DEBIAN
             if d[2] in ['maverick', 'isadora']:
@@ -144,10 +151,12 @@ def system_info():
                 distro_version = DistroVersion.UBUNTU_RARING
             elif d[2] in ['saucy', 'petra']:
                 distro_version = DistroVersion.UBUNTU_SAUCY
-            elif d[2] in ['trusty', 'qiana']:
+            elif d[2] in ['trusty', 'qiana', 'rebecca']:
                 distro_version = DistroVersion.UBUNTU_TRUSTY
             elif d[2] in ['utopic']:
                 distro_version = DistroVersion.UBUNTU_UTOPIC
+            elif d[2] in ['vivid']:
+                distro_version = DistroVersion.UBUNTU_VIVID
             elif d[1].startswith('6.'):
                 distro_version = DistroVersion.DEBIAN_SQUEEZE
             elif d[1].startswith('7.') or d[1].startswith('wheezy'):
@@ -191,6 +200,9 @@ def system_info():
                 # FIXME Fill this
                 raise FatalError("Distribution OpenSuse '%s' "
                                  "not supported" % str(d))
+        elif d[0].strip() in ['arch']:
+            distro = Distro.ARCH
+            distro_version = DistroVersion.ARCH_ROLLING
         else:
             raise FatalError("Distribution '%s' not supported" % str(d))
     elif platform == Platform.WINDOWS:

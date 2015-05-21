@@ -1,0 +1,25 @@
+# -*- Mode: Python -*- vi:si:et:sw=4:sts=4:ts=4:syntax=python
+
+class Recipe(recipe.Recipe):
+    name = 'gtk-osx-docbook'
+    version = '1.2'
+    stype = SourceType.TARBALL
+    url = 'http://heanet.dl.sourceforge.net/project/gtk-osx/GTK-OSX%%20Build/gtk-osx-docbook-' + version +'.tar.gz'
+    # TODO: check license
+    licenses = [License.GPLv2Plus]
+
+    def configure(self):
+        def inplace_replace(filename, from_string, to_string):
+            src = open(filename).read()
+            src = src.replace(from_string, to_string)
+            dst = open(filename, 'w')
+            dst.write(src)
+            dst.flush()
+            dst.close()
+
+        # FIXME: ugly workaround for issues with append_env raciness
+        filename = os.path.join(self.build_dir, 'install.sh')
+        inplace_replace(filename, '$DESTDIR/$JHBUILD_PREFIX', self.config.prefix)
+        inplace_replace(filename, '$JHBUILD_PREFIX', self.config.prefix)
+        filename = os.path.join(self.build_dir, 'Makefile')
+        inplace_replace(filename, '$(JHBUILD_PREFIX)', self.config.prefix)

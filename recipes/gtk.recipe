@@ -102,7 +102,8 @@ class Recipe(recipe.Recipe):
                                                        DistroVersion.UBUNTU_RARING,
                                                        DistroVersion.UBUNTU_SAUCY,
                                                        DistroVersion.UBUNTU_TRUSTY,
-                                                       DistroVersion.UBUNTU_UTOPIC]:
+                                                       DistroVersion.UBUNTU_UTOPIC,
+                                                       DistroVersion.UBUNTU_VIVID]:
                 if self.config.target_arch == Architecture.X86:
                     mod_path2 = '/usr/lib/i386-linux-gnu/gtk-2.0'
                 elif self.config.target_arch == Architecture.X86_64:
@@ -130,6 +131,8 @@ class Recipe(recipe.Recipe):
             elif self.config.target_distro == Distro.SUSE:
                 if self.config.target_arch == Architecture.X86_64:
                     mod_path1 = '/usr/lib64/gtk-2.0'
+            elif self.config.target_distro == Distro.ARCH:
+                    mod_path1 = '/usr/lib/gtk-2.0'
             else:
                 raise FatalError(_("Add specific for other Linux distributions here"))
             self._set_flags(mod_path1, mod_path2, themes_path)

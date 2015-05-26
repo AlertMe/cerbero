@@ -18,7 +18,8 @@ class Recipe(custom.GStreamerStatic):
         --disable-spandsp --disable-teletextdec --disable-timidity \
         --disable-vdpau --disable-voamrwbenc --disable-wildmidi \
         --disable-xvid --disable-zbar --disable-sdi --disable-hls'
-    commit = 'f01d47d0f25cf18347a424c2f4bf12f059a0f12d'
+    remotes = {'origin': 'git://anongit.freedesktop.org/gstreamer/gst-plugins-bad'}
+    commit = 'dec8139e65d8860ee0450abd58d6a8da56a675d7'
     deps = ['gstreamer-1.0', 'gst-plugins-base-1.0', 'zlib', 'openh264', 'opus',
             'libsrtp', 'openssl']
     use_system_libs = True
@@ -104,6 +105,3 @@ class Recipe(custom.GStreamerStatic):
             self.append_env['CFLAGS'] += ' -DGST_LEVEL_MAX=GST_LEVEL_FIXME'
 
         super(Recipe, self).prepare()
-
-        self.remotes['origin'] = ('%s/%s' % ('git://anongit.freedesktop.org/gstreamer', 'gst-plugins-bad'))
-        self.remotes['upstream'] = self.remotes['origin']

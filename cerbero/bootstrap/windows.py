@@ -29,8 +29,7 @@ from cerbero.utils import messages as m
 
 # Toolchain
 GCC_VERSION = '4.7.3'
-MINGW_DOWNLOAD_SOURCE = 'http://www.freedesktop.org/software/gstreamer-sdk/'\
-                        'data/packages/2012.5/windows/toolchain'
+MINGW_DOWNLOAD_SOURCE = 'http://gstreamer.freedesktop.org/data/cerbero/toolchain/windows'
 MINGW_TARBALL_TPL = "mingw-%s-gcc-%s-%s-%s.tar.xz"
 
 # Extra dependencies
@@ -99,9 +98,11 @@ class WindowsBootstrapper(BootstrapperBase):
                 pass
 
     def install_python_sdk(self):
+        ### FIXME : MOVE OVER REPOSITORY TO STANDARD ROOT
+        old_sdk_git_root = 'git://anongit.freedesktop.org/gstreamer-sdk'
         m.action(_("Installing Python headers"))
         tmp_dir = tempfile.mkdtemp()
-        shell.call("git clone %s" % os.path.join(self.config.git_root,
+        shell.call("git clone %s" % os.path.join(old_sdk_git_root,
                                                  'windows-external-sdk.git'),
                    tmp_dir)
 
@@ -176,7 +177,7 @@ class WindowsBootstrapper(BootstrapperBase):
             # get the path
             libdir = libdir.split('=')[1]
             # strip the surrounding quotes
-            print libdir
+            print "Replacing old libdir : ", libdir
             return libdir.strip()[1:-1]
 
     def remove_mingw_cpp(self):

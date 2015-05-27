@@ -48,7 +48,7 @@ class Recipe(recipe.Recipe):
     }
     
     # Which commit to be picked up from local/remote repo
-    commit = 'edcf383130f022b45e0dab1ffd09064e7f70a769'
+    commit = '6b9bdd184e1bb4861cb4cb5bb6d1a1583a02fcdb'
     
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'

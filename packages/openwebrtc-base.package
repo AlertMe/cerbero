@@ -31,22 +31,29 @@ class Package(package.Package):
     name = 'openwebrtc-base'
     shortdesc = 'OpenWebRTC'
     longdesc = 'OpenWebRTC'
-    url = "http://www.openwebrtc.io"
+    url = "http://www.openwebrtc.org"
     version = '0.3.0'
     codename = 'Round 3, fight!'
     license = License.LGPL
     vendor = 'Ericsson Research'
-    org = 'io.openwebrtc'
+    org = 'org.openwebrtc'
     uuid = 'cf9531c5-f936-4f56-9cea-8cf1f61398d1'
     deps = ['gstreamer-1.0-core', 'base-system-1.0',]
 
     files = ['openwebrtc', 'openwebrtc-gst-plugins',
-             'seed:libs', 'libusrsctp:libs',]
+             'libusrsctp:libs',]
     files_devel = ['openwebrtc-gst-plugins-static',]
 
     platform_files = {
             Platform.DARWIN: ['openwebrtc-osx-framework'],
             Platform.IOS: ['openwebrtc-girepository'],
-            Platform.LINUX: ['javascriptcoregtk:libs', 'icu:libs']
-            # TODO: Needs javascriptcore and stuff on others
+            Platform.LINUX: []
     }
+
+    def prepare(self):
+        if self.config.variants.owr_bridge:
+            self.files.append('seed:libs')
+            self.platform_files[Platform.LINUX] += ['javascriptcoregtk:libs', 'icu:libs']
+            # TODO: Needs javascriptcore and stuff on others
+        if self.config.variants.python:
+            self.files.append('gst-python-1.0')

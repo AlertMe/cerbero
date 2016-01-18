@@ -3,7 +3,7 @@
 
 class Recipe(recipe.Recipe):
     name = 'harfbuzz'
-    version = '0.9.40'
+    version = '1.0.1'
     stype = SourceType.TARBALL
     url = 'http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-%(version)s.tar.bz2'
     licenses = [License.LGPLv2Plus]
@@ -14,6 +14,8 @@ class Recipe(recipe.Recipe):
         Platform.WINDOWS: ['icu']
     }
     configure_options = '--enable-static --enable-glib --enable-gobject '
+    patches = [name + '/fix-dll-revision.patch']
+
     files_bins = ['hb-ot-shape-closure', 'hb-view', 'hb-shape']
     files_libs = ['libharfbuzz']
     files_devel = ['include/harfbuzz/*.h', 'lib/pkgconfig/harfbuzz.pc']

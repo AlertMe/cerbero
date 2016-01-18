@@ -51,7 +51,7 @@ class Variants(object):
     __disabled_variants = ['x11', 'alsa', 'pulse', 'cdparanoia', 'v4l2', 'sdl',
                            'gi', 'python3', 'gtk3', 'owr_extra_codecs',
                            'owr_testing', 'gnutls']
-    __enabled_variants = ['debug', 'clutter', 'python', 'testspackage']
+    __enabled_variants = ['debug', 'clutter', 'python', 'testspackage', 'owr_bridge']
 
     def __init__(self, variants):
         for v in self.__enabled_variants:
@@ -90,10 +90,10 @@ class Config (object):
                    'universal_archs', 'osx_target_sdk_version', 'variants',
                    'build_tools_prefix', 'build_tools_sources',
                    'build_tools_cache', 'home_dir', 'recipes_commits',
-                   'ios_platform', 'extra_build_tools',
+                   'recipes_remotes', 'ios_platform', 'extra_build_tools',
                    'distro_packages_install', 'interactive',
                    'target_arch_flags', 'sysroot', 'isysroot',
-                   'extra_lib_path']
+                   'extra_lib_path', 'cached_sources']
 
     def __init__(self):
         self._check_uninstalled()
@@ -287,6 +287,7 @@ class Config (object):
         self.set_property('prefix', None)
         self.set_property('sources', None)
         self.set_property('local_sources', None)
+        self.set_property('cached_sources', self._relative_path('sources'))
         self.set_property('git_root', DEFAULT_GIT_ROOT)
         self.set_property('allow_parallel_build', DEFAULT_ALLOW_PARALLEL_BUILD)
         self.set_property('host', None)
@@ -322,6 +323,7 @@ class Config (object):
         self.set_property('build_tools_sources', None)
         self.set_property('build_tools_cache', None)
         self.set_property('recipes_commits', {})
+        self.set_property('recipes_remotes', {})
         self.set_property('extra_build_tools', {})
         self.set_property('distro_packages_install', True)
         self.set_property('interactive', True)
@@ -352,6 +354,11 @@ class Config (object):
         if recipe_name in self.recipes_commits:
             return self.recipes_commits[recipe_name]
         return None
+
+    def recipe_remotes(self, recipe_name):
+        if recipe_name in self.recipes_remotes:
+            return self.recipes_remotes[recipe_name]
+        return {}
 
     def cross_compiling(self):
         return self.target_platform != self.platform or \

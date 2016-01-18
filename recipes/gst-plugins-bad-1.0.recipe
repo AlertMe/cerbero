@@ -3,27 +3,27 @@
 
 class Recipe(recipe.Recipe):
     name = 'gst-plugins-bad-1.0'
-    version = '1.5'
+    version = '1.7'
     licenses = [License.LGPLv2Plus]
     config_sh = 'sh ./autogen.sh --noconfigure && ./configure'
     configure_options = '--enable-static --disable-introspection --disable-gsm \
         --disable-examples --disable-festival \
         --disable-videomaxrate --disable-bz2 --disable-libde265 \
-        --disable-decklink --disable-linsys --disable-fbdev --disable-apexsink \
+        --disable-linsys --disable-fbdev --disable-apexsink \
         --disable-celt --disable-curl --disable-dc1394 --disable-directfb \
         --disable-dirac --disable-faac --disable-flite --disable-gme \
         --disable-ladspa --disable-lv2 --disable-mimic --disable-modplug \
         --disable-mpeg2enc --disable-mplex --disable-musepack --disable-mythtv \
         --disable-neon --disable-ofa --disable-openal --disable-opencv \
         --disable-pvr --disable-sdl --disable-sndfile --disable-soundtouch \
-        --disable-spandsp --disable-teletextdec --disable-timidity \
+        --disable-teletextdec --disable-timidity \
         --disable-vdpau --disable-voamrwbenc --disable-wildmidi \
-        --disable-xvid --disable-zbar --disable-sdi --disable-hls'
+        --disable-xvid --disable-zbar --disable-sdi --disable-hls --disable-qt'
     # Explicitly enable plugins
     configure_options += ' --enable-openh264 --enable-opus \
         --enable-srtp'
     remotes = {'origin': 'git://anongit.freedesktop.org/gstreamer/gst-plugins-bad'}
-    commit = 'dec8139e65d8860ee0450abd58d6a8da56a675d7'
+    commit = 'bf86d7fef1de204eec08b18e1aebb8fc5797b220'
     deps = ['gstreamer-1.0', 'gst-plugins-base-1.0', 'zlib', 'openh264', 'opus',
             'libsrtp', 'openssl']
     use_system_libs = True
@@ -34,6 +34,7 @@ class Recipe(recipe.Recipe):
 
     files_plugins_devel = [
         'include/gstreamer-1.0/gst/gl',
+        'lib/gstreamer-1.0/include/gst/gl'
     ]
 
     files_plugins_effects = [
@@ -86,7 +87,8 @@ class Recipe(recipe.Recipe):
 
     platform_files_plugins_sys = {
         Platform.LINUX: [
-             'lib/gstreamer-1.0/libgstopengl%(mext)s'
+             'lib/gstreamer-1.0/libgstopengl%(mext)s',
+             'lib/gstreamer-1.0/libgstdecklink%(mext)s',
             ],
         Platform.WINDOWS: [
              'lib/gstreamer-1.0/libgstd3dvideosink%(mext)s',
@@ -94,7 +96,8 @@ class Recipe(recipe.Recipe):
             ],
         Platform.DARWIN: [
              'lib/gstreamer-1.0/libgstapplemedia%(mext)s',
-             'lib/gstreamer-1.0/libgstopengl%(mext)s'
+             'lib/gstreamer-1.0/libgstopengl%(mext)s',
+             'lib/gstreamer-1.0/libgstdecklink%(mext)s',
             ],
         Platform.IOS: [
              'lib/gstreamer-1.0/libgstapplemedia%(mext)s',
@@ -109,11 +112,18 @@ class Recipe(recipe.Recipe):
         'GstGL-1.0',
         ]
 
+    files_plugins_sys  = []
+
     def prepare(self):
         self.append_env['CFLAGS'] = " -Wno-error -DGSTREAMER_GLIB_COCOA_NSAPPLICATION=1 "
         self.append_env['OBJCFLAGS'] = " -Wno-error -DGSTREAMER_GLIB_COCOA_NSAPPLICATION=1 "
         self.append_env['CXXFLAGS'] = " -Wno-error "
         self.append_env['CPPFLAGS'] = " -Wno-error "
+
+        if self.config.variants.gtk3:
+            self.deps.append("gtk+3")
+            self.files_plugins_sys = ["lib/gstreamer-1.0/libgstgtksink%(mext)s"]
+
         if self.config.target_platform != Platform.LINUX:
             self.configure_options += '--disable-gtk-doc '
         if self.config.variants.nodebug:

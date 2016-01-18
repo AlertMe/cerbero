@@ -25,12 +25,11 @@ from cerbero.errors import FatalError
 from cerbero.utils import _, N_, shell
 from cerbero.utils import messages as m
 from cerbero.packages import PackagerBase
-from cerbero.config import DistroVersion
 
 
 LAUNCH_BUNDLE_COMMAND = """# Try to discover plugins only once
 PLUGINS_SYMLINK=${HOME}/.cache/gstreamer-1.0/%(appname)s-gstplugins
-rm ${PLUGINS_SYMLINK}
+rm ${PLUGINS_SYMLINK} > /dev/null 2>&1
 ln -s ${APPDIR}/lib/gstreamer-1.0/ ${PLUGINS_SYMLINK}
 if [ $? -ne 0 ]; then
     export GST_PLUGIN_PATH=${APPDIR}/lib/gstreamer-1.0/
@@ -38,13 +37,33 @@ else
     export GST_PLUGIN_PATH=${PLUGINS_SYMLINK}
 fi
 
+which gdk-pixbuf-query-loaders > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    export GDK_PIXBUF_MODULE_FILE=/tmp/$(basename $APPDIR).gdk-pixbuf-loader.cache
+    gdk-pixbuf-query-loaders $APPDIR/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so > $GDK_PIXBUF_MODULE_FILE 2>&1
+fi
+
 if test -z ${APP_IMAGE_TEST}; then
     # Invoke the app with the arguments passed
     cd ${APPDIR}
     ${APPDIR}/%(executable_path)s $*
 else
-    # Run a shell in test mode
-    bash;
+    if [ $SHELL = "/bin/zsh" ]; then
+        export ZDOTDIR=$(mktemp -d)
+        mkdir -p $ZDOTDIR
+        cp ~/.zshrc $ZDOTDIR
+        echo "autoload -Uz bashcompinit; bashcompinit" >> $ZDOTDIR/.zshrc
+        echo "PROMPT=[%(appname)s]\ \$PROMPT" >> $ZDOTDIR/.zshrc
+        zsh
+    elif [ $SHELL = "/bin/bash" ]; then
+        RCFILE=$(mktemp -d)/.bashrc
+        cp ~/.bashrc $RCFILE
+        echo "" >> $RCFILE
+        echo "export PS1=[%(appname)s]\ \$PS1" >> $RCFILE
+        /bin/bash --rcfile $RCFILE
+    else
+        CERBERO_ENV="[%(appname)s]" $SHELL
+    fi
 fi
 
 # Cleaning up the link to gstplugins
@@ -57,11 +76,10 @@ class LinuxBundler(PackagerBase):
 
     def __init__(self, config, package, store):
         PackagerBase.__init__(self, config, package, store)
-        self.bundle_name = "%s-%s-%s" %(self.package.name, self.package.version, self.config.arch)
+        self.bundle_name = "%s-%s-%s" % (self.package.name, self.package.version, self.config.arch)
         if not hasattr(self.package, "desktop_file"):
             raise FatalError("Can not create a linux bundle if the package does "
                              "not have a 'desktop_file' property set")
-
 
     def pack(self, output_dir, devel=True, force=False, keep_temp=False):
         self.tmp_install_dir = os.path.join(output_dir, "bundle_root")
@@ -69,7 +87,7 @@ class LinuxBundler(PackagerBase):
         if self._force:
             try:
                 shutil.rmtree(self.tmp_install_dir)
-            except OSError as e:
+            except OSError:
                 pass
 
         self.desktop_file = os.path.join(self.tmp_install_dir, self.package.desktop_file)
@@ -110,11 +128,6 @@ class LinuxBundler(PackagerBase):
 
         shell.call("ln -s . usr", self.tmp_install_dir, fail=False)
 
-        # Make gd-pixbuf loader.cache file use relative paths
-        cache = os.path.join(self.tmp_install_dir, 'lib', 'gdk-pixbuf-2.0',
-            '2.10.0', 'loaders.cache')
-        shell.replace(cache, {self.config.install_dir: '.'})
-
         for icondir in os.listdir(os.path.join(self.tmp_install_dir, "share/icons/")):
             if os.path.exists(os.path.join(icondir, "index.theme")):
                 shell.call("gtk-update-icon-cache %s" % icondir, fail=False)
@@ -132,20 +145,17 @@ class LinuxBundler(PackagerBase):
     def _install_bundle_specific_files(self):
         # Installing desktop file and runner script
         shell.call("cp %s %s" % (self.desktop_file, self.tmp_install_dir), fail=False)
-        filepath = os.path.join(self.tmp_install_dir, "AppRun")
         # Base environment variables
         env = {}
         env['GSETTINGS_SCHEMA_DIR'] = '${APPDIR}/share/glib-2.0/schemas/:${GSETTINGS_SCHEMA_DIR}'
-        env['GDK_PIXBUF_MODULE_FILE'] = './lib/gdk-pixbuf-2.0/2.10.0/loaders.cache'
         env['GST_REGISTRY'] = '${HOME}/.cache/gstreamer-1.0/%s-bundle-registry' % self.package.name
         env['GST_REGISTRY_1_0'] = '${HOME}/.cache/gstreamer-1.0/%s-bundle-registry' % self.package.name
         if hasattr(self.package, "default_gtk_theme"):
             env['GTK_THEME'] = self.package.default_gtk_theme
 
-        launch_command = LAUNCH_BUNDLE_COMMAND % ({
-                                "prefix": self.tmp_install_dir,
-                                "executable_path": self.package.commands[0][1],
-                                "appname": self.package.name})
+        launch_command = LAUNCH_BUNDLE_COMMAND % ({"prefix": self.tmp_install_dir,
+                                                   "executable_path": self.package.commands[0][1],
+                                                   "appname": self.package.name})
 
         shellvarsgen = gensdkshell.GenSdkShell()
 
@@ -186,17 +196,12 @@ class LinuxBundler(PackagerBase):
              [(_("Copy install path"), self._copy_installdir, True),
               (_("Installing bundle files"), self._install_bundle_specific_files, True),
               (_("Make all paths relatives"), self._make_paths_relative, True),
-              ]
-            ),
+              ]),
             ("generate-tarball",
              [(_("Running AppImageAssistant"), self._generate_bundle, True),
-              (_("Generating md5"), self._generate_md5sum, True)
-             ]
-            ),
+              (_("Generating md5"), self._generate_md5sum, True)]),
             ("clean-install-dir",
-             [(_("Clean tmp dirs"), self._clean_tmps, not self.keep_temp)]
-            )
-        ]
+             [(_("Clean tmp dirs"), self._clean_tmps, not self.keep_temp)])]
 
         for step in steps:
             shell.set_logfile_output("%s/%s-bundle-%s.log" % (self.config.logs, self.package.name, step[0]))

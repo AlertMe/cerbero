@@ -19,9 +19,9 @@ GLIB_CONFIG_UNVERSAL='''\
 
 class Recipe(recipe.Recipe):
     name = 'glib'
-    version = '2.44.0'
+    version = '2.46.1'
     stype = SourceType.TARBALL
-    url = 'http://ftp.acc.umu.se/pub/GNOME/sources/glib/2.44/glib-%(version)s.tar.xz'
+    url = 'http://ftp.acc.umu.se/pub/GNOME/sources/glib/2.46/glib-%(version)s.tar.xz'
     licenses = [License.LGPLv2Plus]
     config_sh = 'sh autogen.sh'
     deps = ['libffi', 'zlib']
@@ -36,8 +36,8 @@ class Recipe(recipe.Recipe):
                "glib/0009-Unhide-_g_io_modules_ensure_extension_points_registe.patch",
                'glib/0014-Don-t-use-AT_FDCWD-on-iOS-for-now.patch',
                'glib/0015-Implementation-of-Cocoa-event-loop-integration-in-GM.patch',
-               'glib/0016-gio-Fix-build-on-Android-Lollipop.patch',
-               'glib/0017-glib-gio-fix-redefine.patch'
+               'glib/0020-Include-ntdef.h-for-NTSTATUS.patch',
+               'glib/0030-Library-ctor-order.patch'
               ]
 
     files_libs = [
@@ -111,6 +111,7 @@ class Recipe(recipe.Recipe):
             self.make = '%s private_LDFLAGS=""' % self.make
         elif self.config.target_platform == Platform.WINDOWS:
             self.configure_options += ' --with-libiconv=gnu'
+            self.append_env['CFLAGS'] = ' -DMINGW_HAS_SECURE_API=1 '
         elif self.config.target_platform in [Platform.DARWIN, Platform.IOS]:
             self.files_devel.append(os.path.join('lib', 'glib-2.0', 'include', '*', 'glibconfig.h'))
 
@@ -169,6 +170,7 @@ class Recipe(recipe.Recipe):
                                                        DistroVersion.FEDORA_20,
                                                        DistroVersion.FEDORA_21,
                                                        DistroVersion.FEDORA_22,
+                                                       DistroVersion.FEDORA_23,
                                                        DistroVersion.REDHAT_6,
                                                        DistroVersion.REDHAT_7,
                                                        ]:

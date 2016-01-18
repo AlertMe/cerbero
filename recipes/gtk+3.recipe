@@ -3,21 +3,22 @@
 
 class Recipe(recipe.Recipe):
     name = 'gtk+3'
-    version = '3.14.1'
+    version = '3.16.4'
     # TODO: check license - some source files are LGPLv2, others LGPLv2+,
     #       others LGPLv2.1+, COPYING is LGPLv2 and the webpage states LGPLv2.1
     licenses = [License.LGPLv2_1Plus]
     configure_options = '--with-included-immodules '
-    deps = ['glib', 'atk', 'pango', 'gdk-pixbuf', 'cairo']
+    deps = ['glib', 'atk', 'pango', 'gdk-pixbuf', 'cairo', 'libepoxy']
     platform_deps = {
         Platform.LINUX: ['at-spi2-atk'],
     }
     use_system_libs = True
 
     stype = SourceType.TARBALL
-    url = 'http://ftp.gnome.org/pub/GNOME/sources/gtk+/3.14/gtk+-%(version)s.tar.xz'
+    url = 'http://ftp.gnome.org/pub/GNOME/sources/gtk+/3.16/gtk+-%(version)s.tar.xz'
     tarball_dirname = 'gtk+-%(version)s'
 
+    patches = ['gtk+3/0001-x11-Avoid-X-error-traps-within-server-grabs.patch']
     files_libs = ['libgailutil-3', 'libgdk-3', 'libgtk-3']
 
     files_bins = ['gtk3-widget-factory',
@@ -102,7 +103,7 @@ class Recipe(recipe.Recipe):
         elif self.config.target_platform == Platform.DARWIN:
             self.configure_options += '--enable-quartz-backend '
             # this patch will break on other OSs without objective-c compiler installed
-            self.patches = ['gtk+3/0001-osx-fix-build-of-quartz-input-module.patch']
+            self.patches.append('gtk+3/0001-osx-fix-build-of-quartz-input-module.patch')
         elif self.config.target_platform == Platform.LINUX:
             # Can't change CFLAGS and use configure cache
             self.can_use_configure_cache = False
@@ -144,6 +145,7 @@ class Recipe(recipe.Recipe):
                                                        DistroVersion.FEDORA_20,
                                                        DistroVersion.FEDORA_21,
                                                        DistroVersion.FEDORA_22,
+                                                       DistroVersion.FEDORA_23,
                                                        DistroVersion.REDHAT_6,
                                                        DistroVersion.REDHAT_7,
                                                       ]:

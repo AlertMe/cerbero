@@ -52,7 +52,8 @@ class DebianBootstrapper (UnixBootstrapper):
                 'build-essential', 'devscripts', 'fakeroot', 'transfig',
                 'gperf', 'libdbus-glib-1-dev', 'wget', 'glib-networking',
                 'libxtst-dev', 'libxrandr-dev', 'libglu1-mesa-dev', 'ruby',
-                'vim-common']
+                'libegl1-mesa-dev', 'git', 'subversion', 'vim-common',
+                'xutils-dev']
     distro_packages = {
         DistroVersion.DEBIAN_SQUEEZE: ['libgtk2.0-dev'],
         DistroVersion.UBUNTU_MAVERICK: ['libgtk2.0-dev'],
@@ -67,6 +68,7 @@ class DebianBootstrapper (UnixBootstrapper):
     def __init__(self, config):
         UnixBootstrapper.__init__(self, config)
         if self.config.target_platform == Platform.WINDOWS:
+            self.packages.append('mingw-w64-tools')
             if self.config.arch == Architecture.X86_64:
                 self.packages.append('libc6:i386')
         if self.config.target_platform == Platform.LINUX:
@@ -93,11 +95,13 @@ class RedHatBootstrapper (UnixBootstrapper):
                 'perl-XML-Simple', 'gperf', 'gdk-pixbuf2-devel', 'wget',
                 'docbook-utils-pdf', 'glib-networking', 'help2man',
                 'dbus-devel', 'glib2-devel', 'libXrandr-devel',
-                'libXtst-devel', 'ruby', 'vim-common']
+                'libXtst-devel', 'ruby', 'git', 'subversion', 'vim-common',
+                'xorg-x11-util-macros']
 
     def __init__(self, config):
         UnixBootstrapper.__init__(self, config)
         if self.config.target_platform == Platform.WINDOWS:
+            self.packages.append('mingw-w64-tools')
             if self.config.arch == Architecture.X86_64:
                 self.packages.append('glibc.i686')
         if self.config.target_platform == Platform.LINUX:
@@ -119,7 +123,8 @@ class OpenSuseBootstrapper (UnixBootstrapper):
             'xorg-x11-libXv-devel', 'Mesa-libGL-devel', 'libXcomposite-devel',
             'alsa-devel', 'libXi-devel', 'Mesa-devel',
             'perl-XML-Simple', 'gperf', 'gdk-pixbuf-devel', 'wget',
-            'docbook-utils', 'glib-networking', 'ruby', 'vim-common']
+            'docbook-utils', 'glib-networking', 'ruby', 'git', 'subversion',
+            'vim-common']
 
 class ArchBootstrapper (UnixBootstrapper):
 
@@ -128,7 +133,8 @@ class ArchBootstrapper (UnixBootstrapper):
             'libtool', 'bison', 'flex', 'automake', 'autoconf', 'make',
             'curl', 'gettext', 'alsa-lib', 'yasm', 'gperf',
             'docbook-xsl', 'transfig', 'libxrender',
-            'libxv', 'mesa', 'python2', 'wget', 'glib-networking']
+            'libxv', 'mesa', 'python2', 'wget', 'glib-networking', 'git',
+            'subversion', 'xorg-util-macros']
 
     def __init__(self, config):
         UnixBootstrapper.__init__(self, config)

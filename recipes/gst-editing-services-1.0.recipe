@@ -3,7 +3,7 @@ from cerbero.utils import shell
 
 class Recipe(recipe.Recipe):
     name = 'gst-editing-services-1.0'
-    version = '1.5'
+    version = '1.7'
     licenses = [License.LGPLv2Plus]
     remotes = {'origin': 'git://anongit.freedesktop.org/gstreamer/gst-editing-services'}
     commit = 'origin/master'
@@ -15,6 +15,8 @@ class Recipe(recipe.Recipe):
     files_devel = ['include/gstreamer-1.0/ges', 'lib/pkgconfig/gst-editing-services-1.0.pc']
     files_libs = ['libges-1.0']
     files_typelibs = ['GES-1.0']
+
+    files_plugins_ges = [ 'lib/gstreamer-1.0/libgstnle%(mext)s' ]
 
 #    files_python = ['site-packages/ges%(pext)s']
 

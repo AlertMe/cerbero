@@ -447,7 +447,7 @@ gst_android_init (JNIEnv * env, jobject context)
     registry = g_build_filename (cache_dir, "registry.bin", NULL);
     g_setenv ("GST_REGISTRY", registry, TRUE);
     g_free (registry);
-    g_setenv ("GST_REUSE_PLUGIN_SCANNER", "no", TRUE);
+    g_setenv ("GST_REGISTRY_REUSE_PLUGIN_SCANNER", "no", TRUE);
     /* TODO: Should probably also set GST_PLUGIN_SCANNER and GST_PLUGIN_SYSTEM_PATH */
   }
   if (files_dir) {
@@ -489,7 +489,7 @@ gst_android_init (JNIEnv * env, jobject context)
     gchar *message = g_strdup_printf ("GStreamer initialization failed: %s",
         error && error->message ? error->message : "(no message)");
     jclass exception_class = (*env)->FindClass (env, "java/lang/Exception");
-    __android_log_print (ANDROID_LOG_ERROR, "GStreamer", message);
+    __android_log_print (ANDROID_LOG_ERROR, "GStreamer", "%s", message);
     (*env)->ThrowNew (env, exception_class, message);
     g_free (message);
     return;
@@ -514,6 +514,7 @@ jint
 JNI_OnLoad (JavaVM * vm, void * reserved)
 {
   JNIEnv *env = NULL;
+  GModule *module;
 
   if ((*vm)->GetEnv (vm, (void **) &env, JNI_VERSION_1_4) != JNI_OK) {
     __android_log_print (ANDROID_LOG_ERROR, "GStreamer",
@@ -531,6 +532,18 @@ JNI_OnLoad (JavaVM * vm, void * reserved)
     __android_log_print (ANDROID_LOG_ERROR, "GStreamer",
         "Could not register native methods for org.freedesktop.gstreamer.GStreamer");
     return 0;
+  }
+
+  /* Tell the androidmedia plugin about the Java VM if we can */
+  module = g_module_open (NULL, G_MODULE_BIND_LOCAL);
+  if (module) {
+    void (*set_java_vm) (JavaVM *) = NULL;
+
+    if (g_module_symbol (module, "gst_amc_jni_set_java_vm",
+          (gpointer *) & set_java_vm) && set_java_vm) {
+      set_java_vm (vm);
+    }
+    g_module_close (module);
   }
 
   return JNI_VERSION_1_4;

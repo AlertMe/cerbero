@@ -3,8 +3,11 @@
 class Recipe(recipe.Recipe):
     name = 'libnice'
     version = '0.1.13'
-    stype = SourceType.TARBALL
-    url = 'http://nice.freedesktop.org/releases/%(name)s-%(version)s.tar.gz'
+    stype = SourceType.GIT
+    remotes = {
+        'origin':'https://github.com/AlertMe/libnice.git'
+    }
+    commit = 'fc41eedfcd7961d8ebb0002e2007f292ed6ceb82'
     licenses = [License.LGPLv2_1Plus, License.MPLv1_1]
     configure_options = ' --enable-static --enable-shared --with-gstreamer \
             --without-gstreamer-0.10 --enable-compile-warnings=maximum \

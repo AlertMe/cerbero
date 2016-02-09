@@ -41,15 +41,9 @@ class Recipe(recipe.Recipe):
     licenses = [License.BSD_like]
     
     remotes = {
-        # Custom repo on GitHub 'AlertMe/openwebrtc'
-        'origin': 'https://github.com/AlertMe/openwebrtc.git'
-        
-        # For development one can use a local revision
-	# 'origin': '<path_to>/openwebrtc'
+        'origin': 'git@github.com:AlertMe/openwebrtc.git'
     }
-    
-    # Which commit to be picked up from local/remote repo
-    commit = 'fea0d61a7d1614b787e6e600d44a5ad5c4518d0c'
+    commit = 'origin/ZOO-10288-update-google_ice_compat'
     
     autoreconf = True
     autoreconf_sh = 'mkdir -p m4 && gtkdocize && autoreconf -fiv'

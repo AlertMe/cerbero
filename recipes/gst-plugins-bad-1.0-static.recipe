@@ -19,9 +19,9 @@ class Recipe(custom.GStreamerStatic):
         --disable-vdpau --disable-voamrwbenc --disable-wildmidi \
         --disable-xvid --disable-zbar --disable-sdi --disable-hls --disable-qt'
     remotes = {'origin': 'git://anongit.freedesktop.org/gstreamer/gst-plugins-bad'}
-    commit = 'bf86d7fef1de204eec08b18e1aebb8fc5797b220'
+    commit = '81692a99f3fd941101595eabfedfa5e3598b7cf3'
     deps = ['gstreamer-1.0', 'gst-plugins-base-1.0', 'zlib', 'openh264', 'opus',
-            'libsrtp', 'openssl']
+            'libsrtp', 'openssl', 'graphene']
     use_system_libs = True
 
     files_plugins_effects_devel = [
@@ -98,7 +98,11 @@ class Recipe(custom.GStreamerStatic):
 
     files_plugins_sys  = []
 
-    files_devel = []
+    platform_files_codecs_devel = {
+        Platform.ANDROID: [
+              'share/gst-android/ndk-build',
+            ]
+    }
 
     def prepare(self):
         self.append_env['CFLAGS'] = " -Wno-error -DGSTREAMER_GLIB_COCOA_NSAPPLICATION=1 "
@@ -114,9 +118,6 @@ class Recipe(custom.GStreamerStatic):
             self.configure_options += \
                 ' --disable-cog --disable-sdl '\
                 '--disable-cdaudio'
-        if self.config.target_platform == Platform.ANDROID:
-            self.files_devel += \
-                ['share/gst-android/ndk-build']
         if self.config.variants.gtk3:
             self.deps.append("gtk+3")
             self.files_plugins_sys = ["libgstgtksink"]

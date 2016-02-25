@@ -34,7 +34,7 @@ from custom import generate_gir_h_from_gir
 
 class Recipe(recipe.Recipe):
     name = 'openwebrtc'
-    version = '0.3.0'
+    version = '0.3.95'
     owr_version_id = version
     _api_version = '0.3'
     stype = SourceType.GIT

@@ -18,3 +18,16 @@ ways to meet our needs.
 
 We like collaboration and hope the use of cerbero to build OpenWebRTC will be
 mutually beneficial. *All real cerbero changes are being submitted upstream!*
+
+## Branches
+
+`master` - Contains upstream's master branch.
+
+`ZOO-10288-update-custom_ice_compat` - Contains upstream's master branch changes as of February 2016 with our custom fixes and modifications for libnice and OpenWebRTC itself.
+
+`blank_frame_fixes` - OBSOLETE. Attempts to fix the flickering.
+
+`custom_ice_compat` - Added Google ICE compatibility mode.
+
+`custom` - Using custom libnice and OpenWebRTC forks. Probably obsolete.
+
